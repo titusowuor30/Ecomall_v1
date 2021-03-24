@@ -6,20 +6,24 @@
 <div class="box">
     <hr class="mt-2">
     <div class="d-block my-3">
-        <div class="custom-control custom-radio">
-            <input id="mpesa" name="paymentMethod" value="mpesa" type="checkbox" class="custom-control-input" checked
-                   required>
-            <label class="custom-control-label" for="credit">M-PESA</label>
-        </div>
-        <div class="custom-control custom-radio">
-            <input id="credit" name="paymentMethod" value="credit-card" type="checkbox" class="custom-control-input"
-                   required>
-            <label class="custom-control-label" for="credit">Credit card</label>
-        </div>
-        <div class="custom-control custom-radio">
-            <input id="paypal" name="paymentMethod" value="paypal" type="checkbox" class="custom-control-input" required>
-            <label class="custom-control-label" for="paypal">Paypal</label>
-        </div>
+        <div class="form-check">
+  <input class="form-check-input" type="radio" name="flexRadioDefault" id="mpesa" checked>
+  <label class="form-check-label" for="mpesa">
+    M-pesa
+  </label>
+</div>
+        <div class="form-check">
+  <input class="form-check-input" type="radio" name="flexRadioDefault" id="credit-card">
+  <label class="form-check-label" for="credit-card">
+    Credit Card
+  </label>
+</div>
+<div class="form-check">
+  <input class="form-check-input" type="radio" name="flexRadioDefault" id="paypal">
+  <label class="form-check-label" for="paypal">
+    Paypal
+  </label>
+</div>
     </div>
     <hr class="mb-4">
 
@@ -43,7 +47,7 @@
     <!--mpesa payment-->
 
     <!--paypal-->
-    <form action="." method="post" name="paypal-form" class="hidable-paypal-form" id="id_paypal">
+    <form action="." method="post" name="paypal-form" class="hidable-paypal-form" id="id_paypal" onclick="toggle('id_paypal')>
         <div class="row">
             <div class="col-md-6 mb-3">
                   <h1 class="title mb-2 mt-2">Credit payment</h1>
@@ -156,5 +160,23 @@ hidable-mpesa-form.show();
 hidable-credit-form.show();
 }
 });
+
+
+function toggle(id) {
+  var ele = document.getElementById(id);
+  if (ele)
+    ele.style.display = ele.style.display === "none" ? "initial" : "none";
+}
+input:checked+#id_mpesa {
+  display: none;
+}
+
+input:checked+#id_paypal {
+  display: none;
+}
+
+input:checked+#id_credit {
+  display: none;
+}
 
 {% endblock extra_scripts %}
