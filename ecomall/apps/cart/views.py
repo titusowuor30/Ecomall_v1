@@ -15,7 +15,34 @@ from .cart import Cart
 from .forms import CheckoutForm
 from apps.order.utilities import checkout, notify_customer, notify_vendor
 
-def cart_detail(request):
+
+def show_cart(request):
+    cart=Cart(request)
+
+    remove_from_cart = request.GET.get('remove_from_cart', '')
+    change_quantity = request.GET.get('change_quantity', '')
+    quantity = request.GET.get('quantity', 0)
+
+    if remove_from_cart:
+        cart.remove(remove_from_cart)
+
+        return redirect('cart')
+
+    if change_quantity:
+        cart.add(change_quantity, quantity, True)
+
+        return redirect('cart')
+    return render(request, 'cart/cart.html')
+
+def success(request):
+    return render(request, 'cart/success.html')
+
+def Payment(request):
+    return render(request, 'cart/payment.html')
+
+
+#####paypal
+def paypal(request):
     cart = Cart(request)
 
     if request.method == 'POST':
@@ -57,44 +84,26 @@ def cart_detail(request):
         form = CheckoutForm()
     return render(request, 'cart/checkout-page.html', {'form': form, 'stripe_pub_key': settings.STRIPE_PUB_KEY})
 
-def show_cart(request):
-    cart=Cart(request)
-
-    remove_from_cart = request.GET.get('remove_from_cart', '')
-    change_quantity = request.GET.get('change_quantity', '')
-    quantity = request.GET.get('quantity', 0)
-
-    if remove_from_cart:
-        cart.remove(remove_from_cart)
-
-        return redirect('cart')
-
-    if change_quantity:
-        cart.add(change_quantity, quantity, True)
-
-        return redirect('cart')
-    return render(request, 'cart/cart.html')
-
-def success(request):
-    return render(request, 'cart/success.html')
 
 
-def getAccessToken(request):
-    consumer_key = 'cHnkwYIgBbrxlgBoneczmIJFXVm0oHky'
-    consumer_secret = '2nHEyWSD4VjpNh2g'
-    api_URL = 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials'
+###########credit card
+def credit_card(request):
+    cart = Cart(request)
+    return render(request, 'cart/payment.html')
 
-    r = requests.get(api_URL, auth=HTTPBasicAuth(consumer_key, consumer_secret))
-    mpesa_access_token = json.loads(r.text)
-    validated_mpesa_access_token = mpesa_access_token['access_token']
-
-    return HttpResponse(validated_mpesa_access_token)
-
-
+###lipa na mpesa
 def lipa_na_mpesa_online(request):
     cart=Cart(request)
-    amount=10
+
+    if request.method == 'POST':
+        phone = request.POST.get('phone', '')
+
+        if phone:
+            phone_no=(int)(phone)
+
     print(cart.get_total_cost())
+    print(phone_no)
+
     access_token = MpesaAccessToken.validated_mpesa_access_token
     api_url = "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
     headers = {"Authorization": "Bearer %s" % access_token}
@@ -104,12 +113,12 @@ def lipa_na_mpesa_online(request):
         "Timestamp": LipanaMpesaPpassword.lipa_time,
         "TransactionType": "CustomerPayBillOnline",
         "Amount":cart.get_total_cost(),
-        "PartyA": 254743793901,  # replace with your phone number to get stk push
+        "PartyA": phone_no,  # replace with your phone number to get stk push
         "PartyB": LipanaMpesaPpassword.Business_short_code,
-        "PhoneNumber": 254743793901,  # replace with your phone number to get stk push
+        "PhoneNumber": phone_no,  # replace with your phone number to get stk push
         "CallBackURL": "https://sandbox.safaricom.co.ke/mpesa/",
         "AccountReference": "Ecomall",
-        "TransactionDesc": "Testing stk push"
+        "TransactionDesc": "Charge from Ecomall"
     }
 
     response = requests.post(api_url, json=request, headers=headers)

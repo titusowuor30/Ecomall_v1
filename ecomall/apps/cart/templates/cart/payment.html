@@ -1,0 +1,160 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Cart | {% endblock %}
+
+{% block content %}
+<div class="box">
+    <hr class="mt-2">
+    <div class="d-block my-3">
+        <div class="custom-control custom-radio">
+            <input id="mpesa" name="paymentMethod" value="mpesa" type="checkbox" class="custom-control-input" checked
+                   required>
+            <label class="custom-control-label" for="credit">M-PESA</label>
+        </div>
+        <div class="custom-control custom-radio">
+            <input id="credit" name="paymentMethod" value="credit-card" type="checkbox" class="custom-control-input"
+                   required>
+            <label class="custom-control-label" for="credit">Credit card</label>
+        </div>
+        <div class="custom-control custom-radio">
+            <input id="paypal" name="paymentMethod" value="paypal" type="checkbox" class="custom-control-input" required>
+            <label class="custom-control-label" for="paypal">Paypal</label>
+        </div>
+    </div>
+    <hr class="mb-4">
+
+    <!--mpesa payment-->
+    <form action="{% url 'lipa_na_mpesa' %}" method="post" class="hidable-mpesa-form" id="mpesa-form">
+        {% csrf_token %}
+        <div class="field">
+            <h1 class="title mb-2 mt-2">Mpesa payment</h1>
+            <label>Phone Number</label>
+            <div class="control">
+                <input type="text" name="phone" id="id_phone" value="+254" class="input">
+            </div>
+            <p class="help">This should a working phone number!</p>
+        </div>
+        <div class="field">
+            <div class="control">
+                <button class="button is-dark is-uppercase">Pay</button>
+            </div>
+        </div>
+    </form>
+    <!--mpesa payment-->
+
+    <!--paypal-->
+    <form action="." method="post" name="paypal-form" class="hidable-paypal-form" id="id_paypal">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                  <h1 class="title mb-2 mt-2">Credit payment</h1>
+                <label for="ccv-name">Name on card</label>
+                <input type="text" class="form-control" id="ccv-name" placeholder="" required>
+                <small class="text-muted">Full name as displayed on card</small>
+                <div class="invalid-feedback">
+                    Name on card is required
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="cc-number">Credit card number</label>
+                <input type="text" class="form-control" id="id-ccv-number" placeholder="" required>
+                <div class="invalid-feedback">
+                    Credit card number is required
+                </div>
+            </div>
+        </div>
+        <div class="row">
+
+            <div class="col-md-3 mb-3">
+                <label for="cc-expiration">CVV</label>
+                <input type="text" class="form-control" id="id-cvv" placeholder="" required>
+                <div class="invalid-feedback">
+                    Security code required
+                </div>
+            </div>
+        </div>
+    </form>
+    <!--paypal-->
+
+    <!--credit card-->
+    <form action="." method="post" name="credit-form" id="id_credit" class="hidable-credit-from">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                  <h1 class="title mb-2 mt-2">Paypal payment</h1>
+                <label for="cc-name">Name on card</label>
+                <input type="text" class="form-control" id="cc-name" placeholder="" required>
+                <small class="text-muted">Full name as displayed on card</small>
+                <div class="invalid-feedback">
+                    Name on card is required
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="cc-number">Credit card number</label>
+                <input type="text" class="form-control" id="cc-number" placeholder="" required>
+                <div class="invalid-feedback">
+                    Credit card number is required
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 mb-3">
+                <label for="cc-expiration">Expiration</label>
+                <input type="text" class="form-control" id="cc-expiration" placeholder="" required>
+                <div class="invalid-feedback">
+                    Expiration date required
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <label for="cc-expiration">CVV</label>
+                <input type="text" class="form-control" id="cc-cvv" placeholder="" required>
+                <div class="invalid-feedback">
+                    Security code required
+                </div>
+            </div>
+        </div>
+    </form>
+    <!--credit card-->
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+ var hidable-mpesa-form=$('.hidable-mpesa-form');
+ var hidable-paypal-form=$('.hidable-paypal-form');
+ var hidable-credit-form=$('.hidable-credit-form');
+
+ var use-mpesa=document.querySelector("input[id=mpesa]");
+ var use-paypal=document.querySelector("input[id=paypal]");
+ var use-credit=document.querySelector("input[id=credit]");
+
+use-mpesa.addEventListener('change',function(){
+if(this.checked){
+   hidable-credit-form.hide();
+   hidable-paypal-form.hide();
+}else{
+hidable-credit-form.show();
+hidable-paypal-form.show();
+}
+});
+
+
+use-credit.addEventListener('change',function(){
+if(this.checked){
+   hidable-mpesa-form.hide();
+   hidable-paypal-form.hide();
+}else{
+hidable-mpesa-form.show();
+hidable-paypal-form.show();
+}
+});
+
+
+use-paypal.addEventListener('change',function(){
+if(this.checked){
+   hidable-mpesa-form.hide();
+   hidable-credit-form.hide();
+}else{
+hidable-mpesa-form.show();
+hidable-credit-form.show();
+}
+});
+
+{% endblock extra_scripts %}
